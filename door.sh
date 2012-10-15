@@ -8,7 +8,7 @@ CLOSED_INDICATOR=/tmp/door_status_closed
 
 if [ -f $OPEN_INDICATOR ]; then
 	LOCK_AGE=$(( $(date +%s)-$(stat -c %X $OPEN_INDICATOR) ))
-elif [ -f $CLOSE_INDICATOR ]; then
+elif [ -f $CLOSED_INDICATOR ]; then
 	LOCK_AGE=$(( $(date +%s)-$(stat -c %X $CLOSED_INDICATOR) ))
 else
 	LOCK_AGE=15
