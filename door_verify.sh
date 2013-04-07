@@ -20,9 +20,7 @@ aes_decrypt() {
 echo "$1" | xxd -ps -r | openssl enc -aes256 -d -k "$2" >> /dev/null 2>&1
 DECRYPT_OK=$?
 DECRYPTED_TEXT="$(echo "$1" | xxd -ps -r | openssl enc -aes256 -d -k "$2" 2>&1)"
-if [ $DECRYPT_OK -ne 0 ]; then
-	DECRYPTED_TEXT="DEADBEEF"
-fi
+[ $DECRYPT_OK -ne 0 ] && DECRYPTED_TEXT="DEADBEEF"
 echo $DECRYPTED_TEXT
 }
 
@@ -35,7 +33,7 @@ if [ ! -f $KEYFILE ]; then
 	exit 1
 fi
 
-if [ ! -f $LOGFILE ]; then
+if [ ! -f "$LOGFILE" ]; then
         echo "generating new logfile" >&2
 	echo "# DATE:ID:SIGNED_DATE:STATUS" > $LOGFILE
 	chmod 600 $LOGFILE
