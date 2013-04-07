@@ -4,6 +4,8 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 OPEN_INDICATOR=/tmp/door_status_open
 CLOSED_INDICATOR=/tmp/door_status_closed
+GPIO_SWITCH=21
+WATCHDOG_PID=/tmp/door_watchdog_pid
 
 DELAY=10
 DATE_STRING="$(date +%s)#$(date +"%F %X")"
@@ -52,6 +54,28 @@ cd $(dirname $0) || {
     echo "konnte verzeichniss nicht wechseln"
     exit 1
 }
+
+if ! kill -0 $(cat $WATCHDOG_PID 2> /dev/null) > /dev/null 2>&1; then
+{
+	( while true; do
+		{
+		if [ $(cat /sys/class/gpio/gpio${GPIO_SWITCH}/value) -ne 1 -a -f $CLOSED_INDICATOR ]; then
+			{
+			lock_file $OPEN_INDICATOR
+			lock_file $CLOSED_INDICATOR
+			touch $OPEN_INDICATOR
+			rm -f $CLOSED_INDICATOR >> /dev/null 2>&1
+			unlock_file $OPEN_INDICATOR
+                        unlock_file $CLOSED_INDICATOR
+			}
+		fi
+		sleep .5
+		}
+	done ) &
+	echo $! > $WATCHDOG_PID
+	cat $WATCHDOG_PID
+}
+fi
 
 lock_file $OPEN_INDICATOR
 lock_file $CLOSED_INDICATOR

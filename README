@@ -1,0 +1,15 @@
+Yubikey login:
+^^^^^^^^^^^^^^
+
+-please create /etc/udev/rules.d/92-yubikey.rules with the following content:
+   ACTION=="add", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0010", RUN+="/etc/door/door.sh"
+
+
+
+SSH login:
+^^^^^^^^^^
+
+-in ~/.ssh/authorized_keys add to the first line:
+   no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty
+
+-in /etc/passwd change the the default shell to door_ssh_login.sh
